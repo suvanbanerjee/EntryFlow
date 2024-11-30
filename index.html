@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <title>Visitor Entry Flow</title>
+</head>
+<body style="padding: 1rem;">
+  <h1>Visitor Entry Flow</h1>
+  <hr>
+  <div id="visitor-flow">
+    <h2>Visitor Flow</h2>
+    <form id="visitor-form">
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" name="phone" required>
+      <button type="button" onclick="verifyPhone()">Verify Phone</button>
+    </form>
+    <div id="name-entry" style="display:none;">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+      <label for="place">Place:</label>
+      <input type="text" id="place" name="place" required>
+      <button type="button" onclick="saveName()">Save Name</button>
+    </div>
+    <div id="category-selection" style="display:none;">
+      <label for="category">Category:</label>
+      <select id="category" name="category" onchange="showSubitems()">
+        <option value="HQ Volunteer">HQ Volunteer</option>
+        <option value="Staff">Staff</option>
+        <option value="Coordinator">Coordinator</option>
+        <option value="Vendor">Vendor</option>
+        <option value="Case">Case</option>
+        <option value="Other">Other</option>
+      </select>
+      <div id="subitems" style="display:none;">
+        <label for="subitem">Subitem:</label>
+        <select id="subitem" name="subitem">
+          <option value="Victim">Victim</option>
+          <option value="Companion">Companion</option>
+        </select>
+      </div>
+      <button type="button" onclick="saveCategory()">Save Category</button>
+    </div>
+  </div>
+  <div id="user-info" style="display:none;">
+    <h3>Welcome back, <span id="user-name"></span>!</h3>
+    <p>Place: <span id="user-place"></span></p>
+  </div>
+</body>
+<script rel="script" src="script.js"></script>
+</html>
