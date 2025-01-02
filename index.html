@@ -3,50 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-  <title>Visitor Entry Flow</title>
+  <title>Visitor Onboarding</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
-<body style="padding: 1rem;">
-  <h1>Visitor Entry Flow</h1>
-  <hr>
-  <div id="visitor-flow">
-    <h2>Visitor Flow</h2>
-    <form id="visitor-form">
-      <label for="phone">Phone:</label>
-      <input type="text" id="phone" name="phone" required>
-      <button type="button" onclick="verifyPhone()">Verify Phone</button>
+<body>
+  <div id="container">
+    <h2>Enter Password</h2>
+    <form id="passwordForm" onsubmit="validatePassword(event)">
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
+      <button type="submit">Submit</button>
     </form>
-    <div id="name-entry" style="display:none;">
-      <label for="name">Name:</label>
-      <input type="text" id="name" name="name" required>
-      <label for="place">Place:</label>
-      <input type="text" id="place" name="place" required>
-      <button type="button" onclick="saveName()">Save Name</button>
-    </div>
-    <div id="category-selection" style="display:none;">
-      <label for="category">Category:</label>
-      <select id="category" name="category" onchange="showSubitems()">
-        <option value="HQ Volunteer">HQ Volunteer</option>
-        <option value="Staff">Staff</option>
-        <option value="Coordinator">Coordinator</option>
-        <option value="Vendor">Vendor</option>
-        <option value="Case">Case</option>
-        <option value="Other">Other</option>
-      </select>
-      <div id="subitems" style="display:none;">
-        <label for="subitem">Subitem:</label>
-        <select id="subitem" name="subitem">
-          <option value="Victim">Victim</option>
-          <option value="Companion">Companion</option>
+    
+    <div id="visitorForm" style="display:none;">
+      <h2>Visitor Onboarding</h2>
+      <form id="visitorFormDetails">
+        <label for="phone">Phone Number</label>
+        <input type="text" id="phone" required>
+
+        <div id="details-section" style="display:none;">
+          <label for="name">Name</label>
+          <input type="text" id="name" required>
+
+          <label for="email">Email</label>
+          <input type="email" id="email" required>
+
+          <label for="address">Address</label>
+          <input type="text" id="address" required>
+        </div>
+
+        <label for="category">Purpose of Visit</label>
+        <select id="category" required>
+          <option value="" disabled selected>Select a category</option>
         </select>
-      </div>
-      <button type="button" onclick="saveCategory()">Save Category</button>
+
+        <button type="button" onclick="submitForm()">Submit</button>
+      </form>
     </div>
   </div>
-  <div id="user-info" style="display:none;">
-    <h3>Welcome back, <span id="user-name"></span>!</h3>
-    <p>Place: <span id="user-place"></span></p>
-  </div>
+
+  <script>
+    function validatePassword(event) {
+      event.preventDefault();
+      const inputPassword = document.getElementById('password').value;
+      google.script.run.withSuccessHandler(function(isValid) {
+        if (isValid) {
+          document.getElementById('passwordForm').style.display = 'none';
+          document.getElementById('visitorForm').style.display = 'block';
+        } else {
+          alert("Invalid password!");
+        }
+      }).validatePassword(inputPassword);
+    }
+
+    document.addEventListener('DOMContentLoaded', populateCategories);
+
+    function populateCategories() {
+      google.script.run.withSuccessHandler(function(categories) {
+        const dropdown = document.getElementById('category');
+        categories.forEach(function(category) {
+          const option = document.createElement('option');
+          option.value = category;
+          option.textContent = category;
+          dropdown.appendChild(option);
+        });
+      }).getCategories();
+    }
+
+    document.getElementById('phone').addEventListener('input', function () {
+      const phone = document.getElementById('phone').value;
+      if (phone.length >= 10) {
+        google.script.run.withSuccessHandler(function(result) {
+          const detailsSection = document.getElementById('details-section');
+          if (result.exists) {
+            detailsSection.style.display = 'none';
+          } else {
+            detailsSection.style.display = 'block';
+          }
+        }).checkPhoneNumber(phone);
+      }
+    });
+
+    function submitForm() {
+      const formData = {
+        phone: document.getElementById('phone').value,
+        name: document.getElementById('name').value || null,
+        email: document.getElementById('email').value || null,
+        address: document.getElementById('address').value || null,
+        category: document.getElementById('category').value,
+      };
+      google.script.run.withSuccessHandler(alert).saveFormData(formData);
+    }
+  </script>
 </body>
-<script rel="script" src="script.js"></script>
 </html>
